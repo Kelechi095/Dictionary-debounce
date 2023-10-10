@@ -2,11 +2,13 @@ import { useEffect, useState } from "react"
 import axios from 'axios'
 
 
+
 const URL = "https://api.dictionaryapi.dev/api/v2/entries/en"
 
 function App() {
-  const [query, setQuery] = useState("word")
+  const [query, setQuery] = useState("")
   const [word, setWord] = useState("")
+  const [error, setError] = useState(false)
   const [definition, setDefinition] = useState("")
 
   const fetchDefinition = async() => {
@@ -14,8 +16,12 @@ function App() {
       const response = await axios.get(`${URL}/${query}`)
       setDefinition(response.data[0].meanings[0].definitions[0].definition)
       setWord(response.data[0].word.toUpperCase())
+      setError(false)
     } catch (err) {
+      setError(true)
       console.log(err)
+      setDefinition('')
+      setWord("")
     }
   }
 
@@ -23,6 +29,7 @@ function App() {
     setQuery(e.target.value)
   }
 
+  
   useEffect(() => {
     fetchDefinition()
   }, [query])
@@ -30,6 +37,7 @@ function App() {
   return (
     <>
     <input type="text" value={query} onChange={handleChange} />
+    {error && <p>Word not found</p>}
       <h4>{word}</h4>
       <p>{definition}</p>
     </>
