@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import axios from 'axios'
-import debounce from 'lodash.debounce'
+import useDebounce from "./hooks/useDebounce"
+import { debounce } from "lodash"
 
 
 
@@ -11,10 +12,11 @@ function App() {
   const [word, setWord] = useState("")
   const [error, setError] = useState(false)
   const [definition, setDefinition] = useState("")
+  const debounceValue = useDebounce(query, 500)
 
   const fetchDefinition = async() => {
     try {
-      const response = await axios.get(`${URL}/${query}`)
+      const response = await axios.get(`${URL}/${debounceValue}`)
       setDefinition(response.data[0].meanings[0].definitions[0].definition)
       setWord(response.data[0].word.toUpperCase())
       setError(false)
@@ -26,21 +28,22 @@ function App() {
     }
   }
 
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)
   }
 
   
   useEffect(() => {
-    fetchDefinition()
-  }, [query])
+    if(debounceValue.length)fetchDefinition()
+  }, [debounceValue])
 
   return (
     <section>
     <input type="text" value={query} onChange={handleChange} />
-    {error && <p>Word not found</p>}
-      <h4>{word}</h4>
-      <p>{definition}</p>
+    {error && debounceValue && <p>Word not found</p>}
+      {debounceValue && <h4>{word}</h4>}
+      {debounceValue && <p>{definition}</p>}
     </section>
   )
 }
