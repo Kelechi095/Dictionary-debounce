@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from 'axios'
+import debounce from 'lodash.debounce'
 
 
 
@@ -35,12 +36,12 @@ function App() {
   }, [query])
 
   return (
-    <>
+    <section>
     <input type="text" value={query} onChange={handleChange} />
     {error && <p>Word not found</p>}
       <h4>{word}</h4>
       <p>{definition}</p>
-    </>
+    </section>
   )
 }
 
